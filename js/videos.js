@@ -11,12 +11,7 @@ function loadVideos() {
                 card.className = 'video-card-embed';
                 card.innerHTML = `
                     <div class="video-embed-wrapper">
-                        <iframe src="${item.link}embed" width="100%" height="520" frameborder="0" style="border-radius: 16px; display: block;"></iframe>
-                    </div>
-                    <div class="video-info">
-                        <h4>${item.title}</h4>
-                        <p>${item.desc}</p>
-                        <p class="video-date">📅 ${item.date}</p>
+                        <iframe src="${item.link}embed" width="100%" height="300" frameborder="0" style="border-radius: 16px; display: block;"></iframe>
                     </div>
                 `;
                 videosContainer.appendChild(card);

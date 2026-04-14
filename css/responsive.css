@@ -31,16 +31,13 @@
 }
 
 @media (max-width: 680px) {
-    .hero {
-        padding: 2.5rem 0;
+    .hero-stats {
+        flex-direction: column;
+        gap: 1.5rem;
     }
 
-    .hero h2 {
+    .stat-number {
         font-size: 2rem;
-    }
-
-    .hero p {
-        font-size: 0.95rem;
     }
 
     section {
