@@ -28,14 +28,37 @@
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
             </nav>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
         </div>
     </header>
 
     <main>
-        <section>
+        <section class="page-hero">
             <div class="container">
-                <h3>Latest News</h3>
-                <p>No news for now. Check back later!</p>
+                <div class="page-hero-content">
+                    <p class="eyebrow">News</p>
+                    <h2>Latest School Updates</h2>
+                    <p>Read the current announcements and published updates from Slivana School.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="container">
+                <div class="section-toolbar">
+                    <div class="section-header section-header-left">
+                        <h3>All Updates</h3>
+                        <p>Use the search field to quickly find a school announcement.</p>
+                    </div>
+                    <div class="search-container">
+                        <label class="search-field" for="search-input">
+                            <span>Search news</span>
+                            <input type="text" id="search-input" placeholder="Search by title or content">
+                        </label>
+                    </div>
+                </div>
+                <p id="news-results-summary" class="results-summary" aria-live="polite"></p>
+                <div id="news-container" class="news-grid" aria-live="polite"></div>
             </div>
         </section>
     </main>
@@ -44,13 +67,15 @@
         <div class="container">
             <div class="contact-info">
                 <p>Phone: +964 0750 212 2232</p>
-                <p>Instagram: <a href="https://www.instagram.com/slivana_private_school/">@slivana_private_school</a></p>
-                <p>Facebook: <a href="https://www.facebook.com/slivanaprivatekindergartenandschool">Slivana Private Kindergarten and School</a></p>
+                <p>Instagram: <a href="https://www.instagram.com/slivana_private_school/" target="_blank" rel="noopener noreferrer">@slivana_private_school</a></p>
+                <p>Facebook: <a href="https://www.facebook.com/slivanaprivatekindergartenandschool" target="_blank" rel="noopener noreferrer">Slivana Private Kindergarten and School</a></p>
             </div>
             <p>&copy; 2026 Slivana School. All rights reserved.</p>
         </div>
     </footer>
-
-    <a href="https://wa.me/9647502122232" class="whatsapp-btn" target="_blank">💬</a>
+    <script src="js/embed.js"></script>
+    <script src="js/news.js"></script>
+    <script src="js/theme.js"></script>
+    <a href="https://wa.me/9647502122232" class="whatsapp-btn" target="_blank" rel="noopener noreferrer" aria-label="Chat with Slivana School on WhatsApp">💬</a>
 </body>
 </html>

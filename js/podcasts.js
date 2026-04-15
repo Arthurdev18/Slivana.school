@@ -1,42 +1,107 @@
-// Podcasts page JavaScript
+const podcastUtils = window.SlivanaUtils;
 
 let allPodcasts = [];
 
-function loadPodcasts() {
-    fetch('data/podcasts.json')
-        .then(response => response.json())
-        .then(data => {
-            allPodcasts = data;
-            displayPodcasts(data);
-        })
-        .catch(error => console.error('Error loading podcasts:', error));
+function updatePodcastSummary(count) {
+    const summary = document.getElementById('podcast-results-summary');
+
+    if (!summary) {
+        return;
+    }
+
+    summary.textContent = `${count} podcast${count === 1 ? '' : 's'} shown`;
 }
 
-function displayPodcasts(podcasts) {
+function renderPodcastCard(item) {
+    const title = podcastUtils.escapeHtml(item.title || 'Untitled episode');
+    const postUrl = podcastUtils.normalizeUrl(item.link);
+    const embedUrl = podcastUtils.getInstagramEmbedUrl(item.link);
+
+    return `
+        <article class="media-card podcast-embed">
+            <div class="media-frame embed-wrapper">
+                ${embedUrl
+                    ? `<iframe
+                            src="${embedUrl}"
+                            title="${title}"
+                            loading="lazy"
+                            frameborder="0"
+                            scrolling="no"
+                            allowtransparency="true"></iframe>`
+                    : `<div class="embed-fallback">
+                            <h4>Preview unavailable</h4>
+                            <p>This episode can still be opened directly on Instagram.</p>
+                       </div>`}
+            </div>
+            <div class="media-details podcast-details">
+                <p class="meta-label">${podcastUtils.escapeHtml(podcastUtils.formatDate(item.date))}</p>
+                <h4>${title}</h4>
+                <p>Listen to this published school episode and open the original post for the full Instagram view.</p>
+                ${postUrl
+                    ? `<a class="btn btn-secondary" href="${postUrl}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>`
+                    : ''}
+            </div>
+        </article>
+    `;
+}
+
+function displayPodcasts(podcastItems) {
     const podcastsContainer = document.getElementById('podcasts-container');
-    podcastsContainer.innerHTML = '';
-    podcasts.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'podcast-embed';
-        card.innerHTML = `
-            <div class="embed-wrapper">
-                <iframe src="${item.link}embed" width="50%" height="425" frameborder="0" style="border-radius: 16px; display: block;"></iframe>
-            </div>
-            <div class="podcast-details">
-                <h4>${item.title}</h4>
-                <p><strong>Date:</strong> ${item.date}</p>
-            </div>
-        `;
-        podcastsContainer.appendChild(card);
-    });
+
+    if (!podcastsContainer) {
+        return;
+    }
+
+    if (!podcastItems.length) {
+        podcastUtils.setMessageState(podcastsContainer, 'No matching podcasts', 'Try a different search term or check back later for more episodes.');
+        updatePodcastSummary(0);
+        return;
+    }
+
+    podcastsContainer.innerHTML = podcastItems.map(renderPodcastCard).join('');
+    updatePodcastSummary(podcastItems.length);
 }
 
-function searchPodcasts() {
-    const query = document.getElementById('search-input').value.toLowerCase();
+function filterPodcasts() {
+    const query = document.getElementById('search-input')?.value.trim().toLowerCase() || '';
     const filteredPodcasts = allPodcasts.filter(item =>
-        item.title.toLowerCase().includes(query)
+        (item.title || '').toLowerCase().includes(query)
     );
+
     displayPodcasts(filteredPodcasts);
+}
+
+function loadPodcasts() {
+    const podcastsContainer = document.getElementById('podcasts-container');
+    const searchInput = document.getElementById('search-input');
+
+    if (!podcastsContainer) {
+        return;
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterPodcasts);
+    }
+
+    podcastUtils.setLoadingState(podcastsContainer, 'Loading podcast episodes...');
+
+    fetch('data/podcasts.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Unable to load podcasts.');
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            allPodcasts = Array.isArray(data) ? data : [];
+            displayPodcasts(allPodcasts);
+        })
+        .catch(error => {
+            console.error('Error loading podcasts:', error);
+            podcastUtils.setMessageState(podcastsContainer, 'Podcasts unavailable', 'We could not load the podcast page right now.');
+            updatePodcastSummary(0);
+        });
 }
 
 document.addEventListener('DOMContentLoaded', loadPodcasts);

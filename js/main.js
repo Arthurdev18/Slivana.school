@@ -1,24 +1,43 @@
-// Main JavaScript for Slivana School website
+const utils = window.SlivanaUtils;
 
-// Function to load news on homepage
-function loadNews() {
+function loadNewsPreview() {
+    const newsGrid = document.getElementById('news-grid');
+
+    if (!newsGrid) {
+        return;
+    }
+
+    utils.setLoadingState(newsGrid, 'Loading the latest school updates...');
+
     fetch('data/news.json')
-        .then(response => response.json())
-        .then(data => {
-            const newsGrid = document.getElementById('news-grid');
-            data.slice(0, 3).forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'news-card';
-                card.innerHTML = `
-                    <h4>${item.title}</h4>
-                    <p>${item.date}</p>
-                    <p>${item.summary}</p>
-                `;
-                newsGrid.appendChild(card);
-            });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Unable to load news.');
+            }
+
+            return response.json();
         })
-        .catch(error => console.error('Error loading news:', error));
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) {
+                utils.setMessageState(newsGrid, 'No news yet', 'School updates will appear here as soon as they are published.');
+                return;
+            }
+
+            newsGrid.innerHTML = data
+                .slice(0, 3)
+                .map(item => `
+                    <article class="news-card">
+                        <p class="meta-label">${utils.escapeHtml(utils.formatDate(item.date))}</p>
+                        <h4>${utils.escapeHtml(item.title)}</h4>
+                        <p>${utils.escapeHtml(item.summary)}</p>
+                    </article>
+                `)
+                .join('');
+        })
+        .catch(error => {
+            console.error('Error loading news preview:', error);
+            utils.setMessageState(newsGrid, 'News unavailable', 'We could not load updates right now. Please try again later.');
+        });
 }
 
-// Load news when DOM is loaded
-document.addEventListener('DOMContentLoaded', loadNews);
+document.addEventListener('DOMContentLoaded', loadNewsPreview);
