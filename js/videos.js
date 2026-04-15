@@ -13,8 +13,8 @@ function updateVideoSummary(count) {
 }
 
 function renderVideoCard(item) {
-    const title = videoUtils.escapeHtml(item.title || 'Instagram Video');
-    const description = item.desc ? `<p>${videoUtils.escapeHtml(item.desc)}</p>` : '<p>Watch this published school video on Instagram.</p>';
+    const title = videoUtils.getDisplayTitle(item.title, 'Video post', item.date);
+    const descriptionText = String(item.desc || '').trim() || 'Watch this published school video and open the original Instagram post if you need the full Instagram view.';
     const postUrl = videoUtils.normalizeUrl(item.link);
     const embedUrl = videoUtils.getInstagramEmbedUrl(item.link);
 
@@ -24,7 +24,7 @@ function renderVideoCard(item) {
                 ${embedUrl
                     ? `<iframe
                             src="${embedUrl}"
-                            title="${title}"
+                            title="${videoUtils.escapeHtml(title)}"
                             loading="lazy"
                             frameborder="0"
                             scrolling="no"
@@ -36,10 +36,12 @@ function renderVideoCard(item) {
             </div>
             <div class="media-details card-video-details">
                 <p class="meta-label">${videoUtils.escapeHtml(videoUtils.formatDate(item.date))}</p>
-                <h4>${title}</h4>
-                ${description}
+                <h4 dir="auto">${videoUtils.escapeHtml(title)}</h4>
+                <p dir="auto">${videoUtils.escapeHtml(descriptionText)}</p>
                 ${postUrl
-                    ? `<a class="btn btn-secondary" href="${postUrl}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>`
+                    ? `<div class="media-actions">
+                            <a class="btn btn-secondary" href="${videoUtils.escapeHtml(postUrl)}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>
+                       </div>`
                     : ''}
             </div>
         </article>
@@ -66,7 +68,7 @@ function displayVideos(videoItems) {
 function filterVideos() {
     const query = document.getElementById('search-input')?.value.trim().toLowerCase() || '';
     const filteredVideos = allVideos.filter(item =>
-        [item.title, item.desc, item.date, item.link]
+        [videoUtils.getDisplayTitle(item.title, 'Video post', item.date), item.desc, item.date, item.link]
             .filter(Boolean)
             .some(value => value.toLowerCase().includes(query))
     );
@@ -97,7 +99,7 @@ function loadVideos() {
             return response.json();
         })
         .then(data => {
-            allVideos = Array.isArray(data) ? data : [];
+            allVideos = videoUtils.sortItemsByDateDesc(Array.isArray(data) ? data : []);
             displayVideos(allVideos);
         })
         .catch(error => {

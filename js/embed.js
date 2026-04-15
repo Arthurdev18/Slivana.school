@@ -1,4 +1,6 @@
 window.SlivanaUtils = (() => {
+    const dateOnlyPattern = /^(\d{4})-(\d{2})-(\d{2})$/;
+
     function escapeHtml(value = '') {
         return String(value)
             .replace(/&/g, '&amp;')
@@ -11,6 +13,11 @@ window.SlivanaUtils = (() => {
     function normalizeUrl(url = '') {
         try {
             const parsedUrl = new URL(url);
+
+            if (!/^https?:$/.test(parsedUrl.protocol)) {
+                return '';
+            }
+
             const pathname = parsedUrl.pathname.endsWith('/') ? parsedUrl.pathname : `${parsedUrl.pathname}/`;
             return `${parsedUrl.origin}${pathname}`;
         } catch (error) {
@@ -33,6 +40,20 @@ window.SlivanaUtils = (() => {
             return 'Date not provided';
         }
 
+        const dateOnlyMatch = value.match(dateOnlyPattern);
+
+        if (dateOnlyMatch) {
+            const [, year, month, day] = dateOnlyMatch;
+            const parsedDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+            return new Intl.DateTimeFormat('en-US', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                timeZone: 'UTC'
+            }).format(parsedDate);
+        }
+
         const parsedDate = new Date(value);
 
         if (Number.isNaN(parsedDate.getTime())) {
@@ -48,6 +69,31 @@ window.SlivanaUtils = (() => {
 
     function formatRichText(value = '') {
         return escapeHtml(value).replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+    }
+
+    function toTimestamp(value = '') {
+        const parsedValue = new Date(value).getTime();
+        return Number.isNaN(parsedValue) ? 0 : parsedValue;
+    }
+
+    function sortItemsByDateDesc(items = []) {
+        return [...items].sort((firstItem, secondItem) => toTimestamp(secondItem?.date) - toTimestamp(firstItem?.date));
+    }
+
+    function getDisplayTitle(value = '', fallbackLabel = 'Post', date = '') {
+        const title = String(value || '').trim();
+
+        if (title) {
+            return title;
+        }
+
+        const formattedDate = formatDate(date);
+
+        if (formattedDate === 'Date not provided') {
+            return fallbackLabel;
+        }
+
+        return `${fallbackLabel} from ${formattedDate}`;
     }
 
     function setLoadingState(container, label = 'Loading content...') {
@@ -79,9 +125,11 @@ window.SlivanaUtils = (() => {
     return {
         escapeHtml,
         formatDate,
+        getDisplayTitle,
         formatRichText,
         getInstagramEmbedUrl,
         normalizeUrl,
+        sortItemsByDateDesc,
         setLoadingState,
         setMessageState
     };

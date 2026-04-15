@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slivana School - Podcast Episode</title>
+    <meta name="description" content="Open a single Slivana School podcast episode in a cleaner page view.">
+    <link rel="icon" href="assets/logos/Elementry-school-logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="assets/logos/Elementry-school-logo.png" alt="Slivana Elementary School Logo" class="logo-img">
+                <img src="assets/logos/high-school-logo.png" alt="Slivana High School Logo" class="logo-img">
+                <h1>Slivana School</h1>
+            </div>
+            <nav id="site-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="news.html">News</a></li>
+                    <li><a href="podcasts.html">Podcasts</a></li>
+                    <li><a href="videos.html">Videos</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
+                <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Toggle navigation">Menu</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <div class="page-hero-content">
+                    <p class="eyebrow">Podcast Episode</p>
+                    <h2 id="episode-page-title">Podcast episode</h2>
+                    <p id="episode-page-summary">Open a single published episode in a cleaner page view.</p>
+                    <div class="hero-buttons">
+                        <a href="podcasts.html" class="btn">Back to Podcasts</a>
+                        <a href="contact.html" class="btn btn-secondary">Contact the School</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="container">
+                <div id="podcast-episode-container" class="podcasts-embeds" aria-live="polite"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="contact-info">
+                <p>Phone: +964 0750 212 2232</p>
+                <p>Instagram: <a href="https://www.instagram.com/slivana_private_school/" target="_blank" rel="noopener noreferrer">@slivana_private_school</a></p>
+                <p>Facebook: <a href="https://www.facebook.com/slivanaprivatekindergartenandschool" target="_blank" rel="noopener noreferrer">Slivana Private Kindergarten and School</a></p>
+            </div>
+            <p>&copy; 2026 Slivana School. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/embed.js"></script>
+    <script src="js/podcast-episode.js"></script>
+    <script src="js/theme.js"></script>
+
+    <a href="https://wa.me/9647502122232" class="whatsapp-btn" target="_blank" rel="noopener noreferrer" aria-label="Chat with Slivana School on WhatsApp">💬</a>
+</body>
+</html>

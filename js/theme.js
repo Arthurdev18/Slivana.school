@@ -1,7 +1,28 @@
 const themeToggle = document.getElementById('theme-toggle');
 const navToggle = document.querySelector('.nav-toggle');
 const siteNav = document.getElementById('site-nav');
-const mobileNavQuery = window.matchMedia('(max-width: 760px)');
+const mobileNavQuery = typeof window.matchMedia === 'function'
+    ? window.matchMedia('(max-width: 940px)')
+    : null;
+
+function isMobileViewport() {
+    return Boolean(mobileNavQuery?.matches);
+}
+
+function bindMediaQueryChange(mediaQuery, handler) {
+    if (!mediaQuery) {
+        return;
+    }
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+        mediaQuery.addEventListener('change', handler);
+        return;
+    }
+
+    if (typeof mediaQuery.addListener === 'function') {
+        mediaQuery.addListener(handler);
+    }
+}
 
 function readSavedTheme() {
     try {
@@ -26,6 +47,7 @@ function setTheme(theme) {
     if (themeToggle) {
         themeToggle.textContent = theme === 'dark' ? '☀' : '☾';
         themeToggle.setAttribute('aria-pressed', String(theme === 'dark'));
+        themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
     }
 
     persistTheme(theme);
@@ -33,10 +55,11 @@ function setTheme(theme) {
 
 function highlightCurrentPage() {
     const navLinks = document.querySelectorAll('nav a');
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const pageName = window.location.pathname.split('/').pop() || 'index.html';
+    const navPage = pageName === 'podcast-episode.html' ? 'podcasts.html' : pageName;
 
     navLinks.forEach(link => {
-        const isActive = link.getAttribute('href') === currentPage;
+        const isActive = link.getAttribute('href') === navPage;
         link.classList.toggle('active', isActive);
 
         if (isActive) {
@@ -52,6 +75,7 @@ function setNavOpen(isOpen) {
         return;
     }
 
+    document.body.classList.toggle('nav-open', isOpen);
     siteNav.classList.toggle('is-open', isOpen);
     navToggle.setAttribute('aria-expanded', String(isOpen));
     navToggle.textContent = isOpen ? 'Close' : 'Menu';
@@ -62,9 +86,10 @@ function syncNavForViewport() {
         return;
     }
 
-    if (mobileNavQuery.matches) {
+    if (isMobileViewport()) {
         setNavOpen(false);
     } else {
+        document.body.classList.remove('nav-open');
         siteNav.classList.remove('is-open');
         navToggle.setAttribute('aria-expanded', 'false');
         navToggle.textContent = 'Menu';
@@ -72,7 +97,9 @@ function syncNavForViewport() {
 }
 
 const storedTheme = readSavedTheme();
-const preferredTheme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+const prefersDarkTheme = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-color-scheme: dark)').matches;
+const preferredTheme = storedTheme || (prefersDarkTheme ? 'dark' : 'light');
 
 setTheme(preferredTheme);
 highlightCurrentPage();
@@ -93,11 +120,29 @@ if (navToggle && siteNav) {
 
     siteNav.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-            if (mobileNavQuery.matches) {
+            if (isMobileViewport()) {
                 setNavOpen(false);
             }
         });
     });
 
-    mobileNavQuery.addEventListener('change', syncNavForViewport);
+    document.addEventListener('click', event => {
+        if (!isMobileViewport()) {
+            return;
+        }
+
+        const clickedInsideHeader = event.target.closest('header');
+
+        if (!clickedInsideHeader && navToggle.getAttribute('aria-expanded') === 'true') {
+            setNavOpen(false);
+        }
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && navToggle.getAttribute('aria-expanded') === 'true') {
+            setNavOpen(false);
+        }
+    });
+
+    bindMediaQueryChange(mobileNavQuery, syncNavForViewport);
 }

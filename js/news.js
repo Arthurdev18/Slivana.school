@@ -26,19 +26,26 @@ function displayNews(newsItems) {
     }
 
     newsContainer.innerHTML = newsItems
-        .map(item => `
+        .map(item => {
+            const title = newsUtils.getDisplayTitle(item.title, 'School update', item.date);
+            const summary = item.summary || 'Read this published school update.';
+            const content = item.content || '';
+            const postUrl = newsUtils.normalizeUrl(item.link);
+
+            return `
             <article class="news-card news-card-full">
                 <p class="meta-label">${newsUtils.escapeHtml(newsUtils.formatDate(item.date))}</p>
-                <h4>${newsUtils.escapeHtml(item.title)}</h4>
-                <p>${newsUtils.escapeHtml(item.summary)}</p>
-                <div class="news-card-content">${newsUtils.formatRichText(item.content || '')}</div>
-                ${item.link
+                <h4 dir="auto">${newsUtils.escapeHtml(title)}</h4>
+                <p dir="auto">${newsUtils.escapeHtml(summary)}</p>
+                <div class="news-card-content" dir="auto">${newsUtils.formatRichText(content)}</div>
+                ${postUrl
                     ? `<div class="news-card-actions">
-                            <a class="btn btn-secondary" href="${newsUtils.escapeHtml(newsUtils.normalizeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>
+                            <a class="btn btn-secondary" href="${newsUtils.escapeHtml(postUrl)}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>
                        </div>`
                     : ''}
             </article>
-        `)
+        `;
+        })
         .join('');
 
     updateNewsSummary(newsItems.length);
@@ -85,7 +92,7 @@ function loadAllNews() {
             return response.json();
         })
         .then(data => {
-            allNews = Array.isArray(data) ? data : [];
+            allNews = newsUtils.sortItemsByDateDesc(Array.isArray(data) ? data : []);
             displayNews(allNews);
         })
         .catch(error => {

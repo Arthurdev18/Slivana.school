@@ -3,6 +3,7 @@ const galleryUtils = window.SlivanaUtils;
 function renderGalleryCard(item) {
     const postUrl = galleryUtils.normalizeUrl(item.link);
     const embedUrl = galleryUtils.getInstagramEmbedUrl(item.link);
+    const title = galleryUtils.getDisplayTitle('', 'Gallery post', item.date);
 
     return `
         <article class="gallery-card">
@@ -21,9 +22,12 @@ function renderGalleryCard(item) {
                        </div>`}
             </div>
             <div class="gallery-card-details">
-                <p class="meta-label">${galleryUtils.escapeHtml(galleryUtils.formatDate(item.date))}</p>
+                <div class="gallery-card-copy">
+                    <p class="meta-label">${galleryUtils.escapeHtml(galleryUtils.formatDate(item.date))}</p>
+                    <h4>${galleryUtils.escapeHtml(title)}</h4>
+                </div>
                 ${postUrl
-                    ? `<a class="btn btn-secondary" href="${postUrl}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>`
+                    ? `<a class="btn btn-secondary" href="${galleryUtils.escapeHtml(postUrl)}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>`
                     : ''}
             </div>
         </article>
@@ -48,12 +52,14 @@ function loadGallery() {
             return response.json();
         })
         .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
+            const galleryItems = galleryUtils.sortItemsByDateDesc(Array.isArray(data) ? data : []);
+
+            if (galleryItems.length === 0) {
                 galleryUtils.setMessageState(galleryContainer, 'No gallery posts yet', 'Gallery posts will appear here when they are added.');
                 return;
             }
 
-            galleryContainer.innerHTML = data.map(renderGalleryCard).join('');
+            galleryContainer.innerHTML = galleryItems.map(renderGalleryCard).join('');
         })
         .catch(error => {
             console.error('Error loading gallery:', error);

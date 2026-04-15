@@ -4,7 +4,7 @@
     --font-heading: "Gill Sans", "Trebuchet MS", "Segoe UI", sans-serif;
     --bg: #edf4f7;
     --bg-accent: #d7efe5;
-    --surface: rgba(255, 255, 255, 0.88);
+    --surface: rgba(255, 255, 255, 0.9);
     --surface-strong: #ffffff;
     --surface-soft: rgba(244, 250, 246, 0.92);
     --text: #173042;
@@ -16,6 +16,11 @@
     --primary-strong: #0f4c81;
     --secondary: #1f9d78;
     --highlight: #f59e0b;
+    --header-surface: rgba(10, 42, 66, 0.82);
+    --header-line: rgba(255, 255, 255, 0.12);
+    --radius-lg: 30px;
+    --radius-md: 22px;
+    --radius-sm: 16px;
 }
 
 body.dark-mode {
@@ -33,6 +38,8 @@ body.dark-mode {
     --primary-strong: #7cc9ff;
     --secondary: #3cbf92;
     --highlight: #fbbf24;
+    --header-surface: rgba(7, 16, 28, 0.9);
+    --header-line: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -54,6 +61,8 @@ body {
     color: var(--text);
     line-height: 1.65;
     min-height: 100vh;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
 }
 
 img {
@@ -70,6 +79,14 @@ a:hover {
     color: var(--primary-strong);
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(245, 158, 11, 0.38);
+    outline-offset: 3px;
+}
+
 main {
     position: relative;
 }
@@ -79,7 +96,7 @@ section {
 }
 
 .container {
-    width: min(1180px, calc(100% - 2rem));
+    width: min(1200px, calc(100% - 2rem));
     margin: 0 auto;
 }
 
@@ -100,6 +117,20 @@ section {
 
 .section-shell {
     position: relative;
+}
+
+.section-shell::before {
+    content: "";
+    position: absolute;
+    inset: 1.4rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+    border-bottom: 1px solid rgba(23, 48, 66, 0.04);
+    pointer-events: none;
+}
+
+.section-shell > .container {
+    position: relative;
+    z-index: 1;
 }
 
 .section-header {
@@ -145,6 +176,10 @@ footer h4,
     color: var(--text-soft);
 }
 
+.section-header p {
+    font-size: 1.02rem;
+}
+
 .section-toolbar {
     display: flex;
     align-items: end;
@@ -172,33 +207,35 @@ header {
     top: 0;
     z-index: 100;
     backdrop-filter: blur(18px);
-    background: rgba(12, 52, 83, 0.86);
-    box-shadow: 0 16px 38px rgba(8, 31, 53, 0.16);
+    background: var(--header-surface);
+    border-bottom: 1px solid var(--header-line);
+    box-shadow: 0 12px 34px rgba(8, 31, 53, 0.14);
 }
 
 body.dark-mode header {
-    background: rgba(7, 16, 28, 0.92);
+    background: var(--header-surface);
 }
 
 header .container {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 1rem;
-    min-height: 86px;
+    min-height: 78px;
+    position: relative;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.72rem;
     min-width: 0;
 }
 
 .logo-img {
     width: auto;
-    height: 48px;
-    border-radius: 14px;
+    height: 44px;
+    border-radius: 12px;
     background: rgba(255, 255, 255, 0.16);
     border: 1px solid rgba(255, 255, 255, 0.16);
     padding: 0.15rem;
@@ -207,40 +244,42 @@ header .container {
 .logo h1 {
     color: #ffffff;
     font-family: var(--font-heading);
-    font-size: 1.35rem;
-    letter-spacing: 0.03em;
+    font-size: 1.2rem;
+    letter-spacing: 0.02em;
 }
 
 nav ul {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.65rem;
+    justify-content: flex-end;
+    gap: 0.45rem;
 }
 
 nav {
-    justify-self: end;
+    justify-self: stretch;
 }
 
 nav a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.7rem 1rem;
+    min-height: 42px;
+    padding: 0.62rem 0.92rem;
     border-radius: 999px;
     color: rgba(255, 255, 255, 0.94);
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.94rem;
-    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 nav a:hover,
 nav a.active {
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.18);
     transform: translateY(-1px);
 }
 
@@ -249,6 +288,7 @@ nav a.active {
     align-items: center;
     justify-content: flex-end;
     gap: 0.65rem;
+    flex-shrink: 0;
 }
 
 .theme-toggle {
@@ -256,11 +296,11 @@ nav a.active {
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 1.15rem;
+    font-size: 1rem;
     transition: transform 0.25s ease, background 0.25s ease;
 }
 
@@ -275,8 +315,8 @@ nav a.active {
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
-    min-height: 48px;
-    padding: 0.72rem 1rem;
+    min-height: 44px;
+    padding: 0.68rem 1rem;
     border-radius: 999px;
     cursor: pointer;
     font: inherit;
@@ -293,6 +333,7 @@ nav a.active {
 .hero,
 .page-hero {
     overflow: hidden;
+    position: relative;
 }
 
 .hero::before,
@@ -309,6 +350,8 @@ nav a.active {
 .hero {
     background: linear-gradient(135deg, #0f4c81 0%, #0b7285 45%, #1f9d78 100%);
     color: #ffffff;
+    padding-top: 5rem;
+    padding-bottom: 4rem;
 }
 
 .page-hero {
@@ -332,15 +375,15 @@ nav a.active {
 .hero-layout {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(290px, 0.8fr);
-    gap: 2rem;
+    gap: 2.4rem;
     align-items: center;
 }
 
 .hero-content h2,
 .page-hero h2 {
-    font-size: clamp(2.5rem, 5vw, 4.25rem);
-    line-height: 1.05;
-    margin: 1rem 0 1rem;
+    font-size: clamp(2.55rem, 5vw, 4.4rem);
+    line-height: 1;
+    margin: 0.95rem 0 1rem;
 }
 
 .page-hero-content {
@@ -354,7 +397,7 @@ nav a.active {
 .hero-content > p:last-of-type,
 .page-hero p:last-of-type {
     max-width: 720px;
-    font-size: 1.06rem;
+    font-size: 1.08rem;
 }
 
 .hero-badges {
@@ -372,6 +415,7 @@ nav a.active {
     background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.18);
     font-weight: 600;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .hero-buttons,
@@ -381,21 +425,23 @@ nav a.active {
     gap: 0.9rem;
 }
 
-.hero .btn-secondary {
+.hero .btn-secondary,
+.page-hero .btn-secondary {
     color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.24);
 }
 
-.hero .btn-secondary:hover {
+.hero .btn-secondary:hover,
+.page-hero .btn-secondary:hover {
     color: #ffffff;
     background: rgba(255, 255, 255, 0.16);
 }
 
 .hero-panel {
-    padding: 1.5rem;
-    border-radius: 26px;
-    background: rgba(8, 30, 47, 0.26);
+    padding: 1.55rem;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(8, 30, 47, 0.3), rgba(8, 30, 47, 0.18));
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: var(--shadow);
 }
@@ -417,6 +463,7 @@ nav a.active {
     padding: 0.95rem 1rem;
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .hero-panel-list strong {
@@ -452,6 +499,7 @@ nav a.active {
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
     font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .media-tab:hover,
@@ -464,7 +512,7 @@ nav a.active {
 .split-layout {
     display: grid;
     grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.9fr);
-    gap: 1.5rem;
+    gap: 1.6rem;
     align-items: start;
 }
 
@@ -484,7 +532,7 @@ footer {
     margin-top: 1.5rem;
     background: #0e2233;
     color: #dce7f3;
-    padding: 2.5rem 0;
+    padding: 2.7rem 0;
 }
 
 body.dark-mode footer {
@@ -493,8 +541,16 @@ body.dark-mode footer {
 
 footer .container {
     display: grid;
-    gap: 0.65rem;
+    gap: 0.9rem;
     text-align: center;
+}
+
+.contact-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 1.1rem;
 }
 
 footer p {
@@ -552,5 +608,18 @@ header,
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
     }
 }

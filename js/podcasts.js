@@ -2,6 +2,27 @@ const podcastUtils = window.SlivanaUtils;
 
 let allPodcasts = [];
 
+function createEpisodePageUrl(item) {
+    const params = new URLSearchParams();
+    const title = String(item.title || '').trim();
+    const postUrl = podcastUtils.normalizeUrl(item.link);
+
+    if (title) {
+        params.set('title', title);
+    }
+
+    if (item.date) {
+        params.set('date', item.date);
+    }
+
+    if (postUrl) {
+        params.set('link', postUrl);
+    }
+
+    const query = params.toString();
+    return query ? `podcast-episode.html?${query}` : 'podcast-episode.html';
+}
+
 function updatePodcastSummary(count) {
     const summary = document.getElementById('podcast-results-summary');
 
@@ -13,9 +34,10 @@ function updatePodcastSummary(count) {
 }
 
 function renderPodcastCard(item) {
-    const title = podcastUtils.escapeHtml(item.title || 'Untitled episode');
+    const title = podcastUtils.getDisplayTitle(item.title, 'Podcast episode', item.date);
     const postUrl = podcastUtils.normalizeUrl(item.link);
     const embedUrl = podcastUtils.getInstagramEmbedUrl(item.link);
+    const episodePageUrl = createEpisodePageUrl(item);
 
     return `
         <article class="media-card podcast-embed">
@@ -23,7 +45,7 @@ function renderPodcastCard(item) {
                 ${embedUrl
                     ? `<iframe
                             src="${embedUrl}"
-                            title="${title}"
+                            title="${podcastUtils.escapeHtml(title)}"
                             loading="lazy"
                             frameborder="0"
                             scrolling="no"
@@ -35,11 +57,14 @@ function renderPodcastCard(item) {
             </div>
             <div class="media-details podcast-details">
                 <p class="meta-label">${podcastUtils.escapeHtml(podcastUtils.formatDate(item.date))}</p>
-                <h4>${title}</h4>
+                <h4 dir="auto">${podcastUtils.escapeHtml(title)}</h4>
                 <p>Listen to this published school episode and open the original post for the full Instagram view.</p>
-                ${postUrl
-                    ? `<a class="btn btn-secondary" href="${postUrl}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>`
-                    : ''}
+                <div class="media-actions">
+                    <a class="btn" href="${podcastUtils.escapeHtml(episodePageUrl)}">Open Episode Page</a>
+                    ${postUrl
+                        ? `<a class="btn btn-secondary" href="${podcastUtils.escapeHtml(postUrl)}" target="_blank" rel="noopener noreferrer">Open on Instagram</a>`
+                        : ''}
+                </div>
             </div>
         </article>
     `;
@@ -65,7 +90,12 @@ function displayPodcasts(podcastItems) {
 function filterPodcasts() {
     const query = document.getElementById('search-input')?.value.trim().toLowerCase() || '';
     const filteredPodcasts = allPodcasts.filter(item =>
-        (item.title || '').toLowerCase().includes(query)
+        [
+            podcastUtils.getDisplayTitle(item.title, 'Podcast episode', item.date),
+            item.date
+        ]
+            .filter(Boolean)
+            .some(value => value.toLowerCase().includes(query))
     );
 
     displayPodcasts(filteredPodcasts);
@@ -94,7 +124,7 @@ function loadPodcasts() {
             return response.json();
         })
         .then(data => {
-            allPodcasts = Array.isArray(data) ? data : [];
+            allPodcasts = podcastUtils.sortItemsByDateDesc(Array.isArray(data) ? data : []);
             displayPodcasts(allPodcasts);
         })
         .catch(error => {
